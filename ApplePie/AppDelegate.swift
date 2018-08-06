@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         window?.backgroundColor = .white
         window?.frame = UIScreen.main.bounds
-        window?.rootViewController = FirstViewController()
+        window?.rootViewController = AirLineViewController()
         return true
     }
 
