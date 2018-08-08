@@ -13,14 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        window?.makeKeyAndVisible()
+        window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = .white
-        window?.frame = UIScreen.main.bounds
-        window?.rootViewController = AirLineViewController()
+        window?.makeKeyAndVisible()
+        window?.rootViewController = TabBarController()
         return true
     }
 
