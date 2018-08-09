@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Then
 import SnapKit
 import UIKit
 import RJExtension
@@ -17,31 +16,40 @@ class CalendarViewController : UIViewController {
     
     // UI
     
+    var dates = [[String]]()
+    let yearMenuTableView = YearMenuTableView()
+    let customNaviView = CustomNaviView()
     lazy var dayStackView : UIStackView = {
         
-         let sv = UIStackView(arrangedSubviews:createDayLabel("M","T","W","T","F","S","S"))
+         let sv = UIStackView(arrangedSubviews:createDayLabel("S","M","T","W","T","F","S"))
          sv.axis = .horizontal
          sv.distribution = .fillEqually
         
         return sv
     }()
     
-    
-    let collectionView : UICollectionView = {
+    let calenderCollectionView : UICollectionView = {
         
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
+        layout.scrollDirection = .horizontal
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.isScrollEnabled = true
+        cv.isPagingEnabled = true
+        cv.allowsSelection = false
         
         return cv
         
     }()
     
-    let customNaviView = CustomNaviView()
+    
     
     // Data
+    
+    
+    
 
 }
 
@@ -52,33 +60,51 @@ extension CalendarViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupNavi()
+
+
         setupViews()
+        setupActionForButton()
+        
+        getAllDate {
+            
+            self.calenderCollectionView.reloadData()
+            
+        }
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
     }
     
 }
 
 
-//MARK:- Setup Navi & Views
+//MARK:- SetupViews
 extension CalendarViewController {
     
-    private func setupNavi() {
-        
-        navigationItem.title = "2018"
-        navigationController?.navigationBar.prefersLargeTitles = true
-        
-    }
-    
+
     private func setupViews() {
         
         [
             
-            collectionView,
             dayStackView,
+            calenderCollectionView,
+            yearMenuTableView,
             customNaviView
-        
+
         ].forEach({view.addSubview($0)})
+        
+        
+        yearMenuTableView.snp.makeConstraints {
+            
+            $0.top.equalTo(self.customNaviView.snp.top)
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview()
+            $0.height.equalTo(56)
+            
+        }
         
         customNaviView.snp.makeConstraints {
             
@@ -97,7 +123,7 @@ extension CalendarViewController {
         }
         
         
-        collectionView.snp.makeConstraints {
+        calenderCollectionView.snp.makeConstraints {
             
             $0.top.equalTo(self.dayStackView.snp.bottom)
             $0.leading.equalToSuperview()
@@ -125,17 +151,16 @@ extension CalendarViewController {
         }
         
     }
+
     
     private func setupCollectionView() {
         
-        self.collectionView.registerCell(ofType: CalendarCell.self)
-        self.collectionView.backgroundColor = .white
-        self.collectionView.delegate = self
-        self.collectionView.dataSource = self
+        self.calenderCollectionView.registerCell(ofType: CalendarCell.self)
+        self.calenderCollectionView.backgroundColor = .white
+        self.calenderCollectionView.delegate = self
+        self.calenderCollectionView.dataSource = self
         
     }
-    
-
     
 }
 
@@ -145,32 +170,137 @@ extension CalendarViewController : UICollectionViewDelegate ,UICollectionViewDat
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return 30
+        return 12
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = self.collectionView.dequeueReusableCell(with: CalendarCell.self, for: indexPath)
-        cell.dateLabel.text = (indexPath.item+1).description
+        
+        let cell = self.calenderCollectionView.dequeueReusableCell(with: CalendarCell.self, for: indexPath)
+        cell.dates = self.dates[indexPath.item]
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let size = Int(self.view.frame.width/7)
+        let width = collectionView.frame.width
+        let height = collectionView.frame.height
         
-        return CGSize(width: size, height: size)
+        return CGSize(width: width, height: height)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        
+
+        let x = scrollView.contentOffset.x
+        let contentWidth = scrollView.frame.size.width
+        let indexPathItem = Int(x/contentWidth)
+        
+        changeMonthAndYear(indexPathItem)
+    
+    }
+    
+
+
+}
+
+
+
+//MARK:- Private Func
+extension CalendarViewController {
+    
+    @objc func scrollToCurrentMonth() {
+        
+        let currentMonth = Date.currentMonth()
+        let indexPathItem = Int(currentMonth)!-1
+        let indexPath = IndexPath(item: indexPathItem, section: 0)
+        self.calenderCollectionView.scrollToItem(at:indexPath, at: .centeredHorizontally, animated: true)
+        changeMonthAndYear(indexPathItem)
+        
+    }
+    
+    private func changeMonthAndYear(_ indexPathItem:Int) {
+        
+        let monthStr = Month.January
+        self.customNaviView.yearAndMonth = monthStr.strMonth(indexPathItem)+" 2018"
+  
+    }
+    
+    private func getAllDate(completion:(() ->Void)? = nil) {
+        
+        DispatchQueue.global().sync {
+            
+            for i in 1...12 {
+                
+                let days = Date.days(year:2018 , month: i)
+                self.dates.append(days)
+                print("\(i)월",days)
+            }
+            
+            completion?()
+        }
+        
+    
+    }
+    
+}
+
+//MARK:- Actions
+extension CalendarViewController {
+    
+    func setupActionForButton() {
+        
+        let tapGeusture = UITapGestureRecognizer(target: self, action: #selector(showAndHideYearMenuTV))
+        self.customNaviView.addGestureRecognizer(tapGeusture)
+        self.customNaviView.leftButton.addTarget(self, action: #selector(scrollToCurrentMonth), for: .touchUpInside)
+//        self.yearMenuTableView.headerView.addTarget(self, action: #selector(test), for: .touchUpInside)
+        
+    }
+
+    @objc func showAndHideYearMenuTV() {
+        
+        if yearMenuTableView.isShown {
+            
+            DispatchQueue.main.async {
+                
+                self.yearMenuTableView.snp.updateConstraints {
+                    
+                    $0.top.equalTo(self.customNaviView.snp.top).offset(0)
+                    $0.height.equalTo(0)
+                    
+                }
+                
+                UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                    self.yearMenuTableView.alpha = 0
+                    self.view.layoutIfNeeded()
+                }, completion: { _ in
+                    self.yearMenuTableView.isShown = false
+                })
+            }
+            
+        } else {
+            
+            DispatchQueue.main.async {
+                
+                self.yearMenuTableView.snp.updateConstraints {
+                    $0.top.equalTo(self.customNaviView.snp.top).offset(self.customNaviView.frame.height)
+                    $0.height.equalTo(44*5)
+                    
+                }
+                
+                UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                    self.yearMenuTableView.alpha = 0.95
+                    self.view.layoutIfNeeded()
+                }, completion: { _ in
+                    self.yearMenuTableView.isShown = true
+                })
+            }
+                
+        }
     }
 
 }
 
-extension CalendarViewController {
-    
-}
 
-//MARK:-
-extension CalendarViewController {
-    
-}
 
 
 

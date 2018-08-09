@@ -13,28 +13,45 @@ import UIKit
 
 class CustomNaviView : UIView {
     
-    let leftButton = UIButton().then {
-        $0.setTitle("뒤로", for: .normal)
-        $0.setTitleColor(UIColor.black, for: .normal)
-    }
-    
-    let yearAndMonthLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .headline)
-        $0.text = "August 2018"
+    var yearAndMonth : String? {
+        didSet {
+            
+            yearAndMonthLabel.text = self.yearAndMonth
+            
+        }
         
     }
     
-    let rightButton = UIButton().then {
-        $0.setTitle("앞으로", for: .normal)
-        $0.setTitleColor(UIColor.black, for: .normal)
-    }
+    let leftButton : UIButton = {
+        let b = UIButton()
+        b.setTitle("뒤로", for: .normal)
+        b.setTitleColor(UIColor.black, for: .normal)
+        
+        return b
+    }()
+
+    let yearAndMonthLabel : UILabel = {
+        let l = UILabel()
+        l.font = UIFont.preferredFont(forTextStyle: .headline)
+        l.text = "August 2018"
+        
+        return l
+    }()
+    
+    let rightButton : UIButton = {
+        let b = UIButton()
+        b.setTitle("앞으로", for: .normal)
+        b.setTitleColor(UIColor.black, for: .normal)
+        
+        return b
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         setupViews()
         
-        self.backgroundColor = .red
+        self.backgroundColor = .white
     }
     
     required init?(coder aDecoder: NSCoder) {

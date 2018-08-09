@@ -1,24 +1,20 @@
 PODS:
   - RJExtension (1.0.5)
   - SnapKit (4.0.0)
-  - Then (2.3.0)
 
 DEPENDENCIES:
   - RJExtension
   - SnapKit
-  - Then
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - RJExtension
     - SnapKit
-    - Then
 
 SPEC CHECKSUMS:
   RJExtension: 750ee1f177e942c20aed3648a7e9a4a1c01f638c
   SnapKit: a42d492c16e80209130a3379f73596c3454b7694
-  Then: ee21c97b85ff6062b9b0080c9abb1eea46743345
 
-PODFILE CHECKSUM: 7958c5d69ee75f0dd64c4bca70e3d8c9dffb5656
+PODFILE CHECKSUM: 23f54225ae2e12ac18838a6a8ca7751030880c40
 
 COCOAPODS: 1.5.3
