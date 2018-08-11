@@ -66,7 +66,7 @@ extension CalendarViewController {
         setupActionForButton()
         
         getAllDate {
-            
+            print("데이츠 카운트:",self.dates.count)
             self.calenderCollectionView.reloadData()
             
         }

@@ -78,7 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				56750220211452D40005D750 /* AppDelegate.swift */,
-				569C3400211BE10100D86009 /* New Group */,
+				569C3400211BE10100D86009 /* Extension */,
 				567502342114545A0005D750 /* Controller */,
 				56750233211454550005D750 /* View */,
 				567502322114544E0005D750 /* Model */,
@@ -116,12 +116,12 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		569C3400211BE10100D86009 /* New Group */ = {
+		569C3400211BE10100D86009 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
 				569C3401211BE1ED00D86009 /* Extension.swift */,
 			);
-			path = "New Group";
+			path = Extension;
 			sourceTree = "<group>";
 		};
 		56A86B1D2118224F00EC18C9 /* Cell */ = {

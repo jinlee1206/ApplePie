@@ -85,14 +85,14 @@ public extension Date {
         var numDays = range.count
         var days = [String]()
         
-        var addtionalDay = getWhatDay(year: year, month: month, day: numDays)
-        
-        while !(addtionalDay == 1) {
-            
-            addtionalDay -= 1
-            numDays -= 1
-            days.insert(numDays.description, at: 0)
-        }
+//        var addtionalDay = getWhatDay(year: year, month: month, day: numDays)
+//
+//        while !(addtionalDay == 1) {
+//
+//            addtionalDay -= 1
+//            numDays -= 1
+//            days.insert(numDays.description, at: 0)
+//        }
         
         for i in 1...range.count {
             

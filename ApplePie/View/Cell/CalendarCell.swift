@@ -13,7 +13,16 @@ import RJExtension
 
 class CalendarCell : BasicCollectionViewCell {
     
-    var dates = [String]()
+    var dates = [String]() {
+        
+        didSet {
+            
+            self.dateCollectionView.reloadData()
+            
+        }
+        
+    }
+    
     
     let dateCollectionView : UICollectionView = {
         
