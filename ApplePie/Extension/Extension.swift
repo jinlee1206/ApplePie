@@ -28,29 +28,29 @@ enum Month : String {
 
         switch indexPathItem {
             
-        case 0 :
-            return Month.January.rawValue
         case 1 :
-            return Month.Febuary.rawValue
+            return Month.January.rawValue
         case 2 :
-            return Month.March.rawValue
+            return Month.Febuary.rawValue
         case 3 :
-            return Month.April.rawValue
+            return Month.March.rawValue
         case 4 :
-            return Month.May.rawValue
+            return Month.April.rawValue
         case 5 :
-            return Month.June.rawValue
+            return Month.May.rawValue
         case 6 :
-            return Month.July.rawValue
+            return Month.June.rawValue
         case 7 :
-            return Month.August.rawValue
+            return Month.July.rawValue
         case 8 :
-            return Month.September.rawValue
+            return Month.August.rawValue
         case 9 :
-            return Month.October.rawValue
+            return Month.September.rawValue
         case 10 :
-            return Month.November.rawValue
+            return Month.October.rawValue
         case 11 :
+            return Month.November.rawValue
+        case 12 :
             return Month.December.rawValue
         default:
             return "Error"
@@ -66,6 +66,17 @@ enum Month : String {
 public extension Date {
     
     public static func getWhatDay(year:Int,month:Int,day:Int) -> Int {
+        let calendar = Calendar.current
+        let dateComponents = DateComponents(calendar: calendar, year: year, month: month, day: day)
+        
+//        if let targetDate = calendar.date(from:dateComponents) {
+        
+//            calendar.date(byAdding: ., to: <#T##Date#>)
+//        }
+        
+        if month == 1 {
+            
+        }
         
         let calender = Calendar.current
         let components = DateComponents(calendar: calender,year: year, month: month, day: day)
@@ -81,8 +92,7 @@ public extension Date {
         let calendar = Calendar.current
         let date = calendar.date(from: dateComponents)!
         let range = calendar.range(of: .day, in: .month, for: date)!
-        
-        var numDays = range.count
+        let numberOfDays = range.count
         var days = [String]()
         
 //        var addtionalDay = getWhatDay(year: year, month: month, day: numDays)
@@ -115,7 +125,7 @@ public extension Date {
         
     }
     
-    public static func currentMonth() -> String {
+    public static func currentMonth() -> Int {
         
         let date = Date()
         let calendar = Calendar.current
@@ -123,7 +133,7 @@ public extension Date {
         
         let month = components.month?.description
         
-        return month!
+        return components.month!
         
     }
     

@@ -21,6 +21,8 @@
 		569C340A211C2B1200D86009 /* YearMenuTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569C3409211C2B1200D86009 /* YearMenuTableView.swift */; };
 		56A86B1C211820D800EC18C9 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A86B1B211820D800EC18C9 /* CalendarViewController.swift */; };
 		56A86B1F2118225C00EC18C9 /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A86B1E2118225C00EC18C9 /* CalendarCell.swift */; };
+		56C25B9C212185F700B3D7A6 /* DatePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C25B9B212185F700B3D7A6 /* DatePageViewController.swift */; };
+		56C25B9E212194B900B3D7A6 /* DateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C25B9D212194B900B3D7A6 /* DateViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,8 @@
 		569C3409211C2B1200D86009 /* YearMenuTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearMenuTableView.swift; sourceTree = "<group>"; };
 		56A86B1B211820D800EC18C9 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		56A86B1E2118225C00EC18C9 /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
+		56C25B9B212185F700B3D7A6 /* DatePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePageViewController.swift; sourceTree = "<group>"; };
+		56C25B9D212194B900B3D7A6 /* DateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateViewController.swift; sourceTree = "<group>"; };
 		888674E8BAF8BCD73F202464 /* Pods-ApplePie.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ApplePie.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ApplePie/Pods-ApplePie.debug.xcconfig"; sourceTree = "<group>"; };
 		AABD73BAA9383F7E8E4A0803 /* Pods_ApplePie.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ApplePie.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -112,6 +116,8 @@
 			children = (
 				560C5312211ADFB800349193 /* TabBarController.swift */,
 				56A86B1B211820D800EC18C9 /* CalendarViewController.swift */,
+				56C25B9B212185F700B3D7A6 /* DatePageViewController.swift */,
+				56C25B9D212194B900B3D7A6 /* DateViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -268,7 +274,9 @@
 			files = (
 				56A86B1F2118225C00EC18C9 /* CalendarCell.swift in Sources */,
 				569C3404211C04AE00D86009 /* DateModel.swift in Sources */,
+				56C25B9C212185F700B3D7A6 /* DatePageViewController.swift in Sources */,
 				56750221211452D40005D750 /* AppDelegate.swift in Sources */,
+				56C25B9E212194B900B3D7A6 /* DateViewController.swift in Sources */,
 				569C3402211BE1ED00D86009 /* Extension.swift in Sources */,
 				569C33FF211BD57700D86009 /* DateCell.swift in Sources */,
 				560C5313211ADFB800349193 /* TabBarController.swift in Sources */,

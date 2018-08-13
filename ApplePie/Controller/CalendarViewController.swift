@@ -11,12 +11,17 @@ import SnapKit
 import UIKit
 import RJExtension
 
+enum Direction {
+    case LEFT
+    case RIGHT
+}
+
 
 class CalendarViewController : UIViewController {
     
     // UI
-    
-    var dates = [[String]]()
+    let datePageViewController = DatePageViewController()
+
     let yearMenuTableView = YearMenuTableView()
     let customNaviView = CustomNaviView()
     lazy var dayStackView : UIStackView = {
@@ -40,6 +45,7 @@ class CalendarViewController : UIViewController {
         cv.isPagingEnabled = true
         cv.allowsSelection = false
         
+        
         return cv
         
     }()
@@ -48,9 +54,14 @@ class CalendarViewController : UIViewController {
     
     // Data
     
+    // index 0 == 저번달
+    // index 1 == 이번달
+    // index 2 == 다음달
+    var beforeDate = Date()
+    var centerDate = Date()
+    var afterDate = Date()
+    var dates = [[String]]()
     
-    
-
 }
 
 
@@ -60,21 +71,18 @@ extension CalendarViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
-
         setupViews()
-        setupActionForButton()
-        
-        getAllDate {
-            print("데이츠 카운트:",self.dates.count)
-            self.calenderCollectionView.reloadData()
-            
+        setupActions()
+        updateDatesArray(Date()) {
+            self.reloadCalendarCV()
         }
-        
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+//        scrollToCurrentMonth()
         
     }
     
@@ -87,9 +95,14 @@ extension CalendarViewController {
 
     private func setupViews() {
         
+//        self.addChildViewController(datePageViewController)
+//        view.addSubview(datePageViewController.view)
+//        datePageViewController.didMove(toParentViewController: self)
+        
         [
             
             dayStackView,
+//            datePageViewController.view,
             calenderCollectionView,
             yearMenuTableView,
             customNaviView
@@ -122,9 +135,18 @@ extension CalendarViewController {
             $0.height.equalTo(48)
         }
         
+//        datePageViewController.view.snp.makeConstraints {
+//
+//            $0.top.equalTo(self.dayStackView.snp.bottom)
+//            $0.leading.equalToSuperview()
+//            $0.trailing.equalToSuperview()
+//            $0.bottom.equalToSuperview()
+//
+//        }
+        
         
         calenderCollectionView.snp.makeConstraints {
-            
+
             $0.top.equalTo(self.dayStackView.snp.bottom)
             $0.leading.equalToSuperview()
             $0.trailing.equalToSuperview()
@@ -168,15 +190,25 @@ extension CalendarViewController {
 //MARK:- UICollectionViewDelegate & UICollectionViewDataSource & UICollectionViewDelegateFlowLayout
 extension CalendarViewController : UICollectionViewDelegate ,UICollectionViewDataSource ,UICollectionViewDelegateFlowLayout {
     
+    private func reloadCalendarCV() {
+        
+        DispatchQueue.main.async {
+            self.calenderCollectionView.reloadData()
+        }
+        
+    }
+    
+    
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return 12
+        return self.dates.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = self.calenderCollectionView.dequeueReusableCell(with: CalendarCell.self, for: indexPath)
-        cell.dates = self.dates[indexPath.item]
+//        cell.dates = self.dates[indexPath.item]
         return cell
     }
     
@@ -188,15 +220,27 @@ extension CalendarViewController : UICollectionViewDelegate ,UICollectionViewDat
         return CGSize(width: width, height: height)
     }
     
+    
+//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+//
+//        let x = scrollView.contentOffset.x
+//        let contentWidth = scrollView.frame.size.width
+//        let indexPathItem = Int(x/contentWidth)
+//        print(indexPathItem)
+//        indexPathItem == 0 ? insertAndDeleteCell(direction: .LEFT) : insertAndDeleteCell(direction: .RIGHT)
+//
+//    }
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         
-
         let x = scrollView.contentOffset.x
         let contentWidth = scrollView.frame.size.width
         let indexPathItem = Int(x/contentWidth)
+        print(indexPathItem)
+        indexPathItem == 0 ? insertAndDeleteCell(direction: .LEFT) : insertAndDeleteCell(direction: .RIGHT)
         
-        changeMonthAndYear(indexPathItem)
-    
+
+
     }
     
 
@@ -208,38 +252,91 @@ extension CalendarViewController : UICollectionViewDelegate ,UICollectionViewDat
 //MARK:- Private Func
 extension CalendarViewController {
     
-    @objc func scrollToCurrentMonth() {
+    private func insertAndDeleteCell(direction:Direction) {
         
-        let currentMonth = Date.currentMonth()
-        let indexPathItem = Int(currentMonth)!-1
-        let indexPath = IndexPath(item: indexPathItem, section: 0)
-        self.calenderCollectionView.scrollToItem(at:indexPath, at: .centeredHorizontally, animated: true)
-        changeMonthAndYear(indexPathItem)
+        let firstIndexPath = IndexPath(item: 0, section: 0)
+        let lastIndexPath = IndexPath(item: 2, section: 0)
+        
+        switch direction {
+            
+        case .LEFT:
+            
+            self.centerDate = self.beforeDate
+            self.dates.remove(at:2)
+            self.calenderCollectionView.deleteItems(at: [lastIndexPath])
+            updateDatesArray(self.centerDate, completion: nil)
+            self.calenderCollectionView.insertItems(at: [firstIndexPath])
+            
+            
+//            updateDatesArray(self.centerDate, completion: nil)
+//            self.calenderCollectionView.insertItems(at: [firstIndexPath])
+            
+            
+        case .RIGHT:
+            self.centerDate = self.afterDate
+            self.dates.remove(at:0)
+            self.calenderCollectionView.deleteItems(at: [firstIndexPath])
+            updateDatesArray(self.centerDate, completion: nil)
+            self.calenderCollectionView.insertItems(at: [lastIndexPath])
+        
+        }
         
     }
     
-    private func changeMonthAndYear(_ indexPathItem:Int) {
+    @objc func scrollToCurrentMonth() {
+
+        let centerIndexPath = IndexPath(item: 1, section: 0)
+        self.calenderCollectionView.scrollToItem(at:centerIndexPath, at: .centeredHorizontally, animated: false)
+        
+    }
+    
+    private func changeMonthAndYear(_ centerMonth:Int) {
         
         let monthStr = Month.January
-        self.customNaviView.yearAndMonth = monthStr.strMonth(indexPathItem)+" 2018"
+        self.customNaviView.yearAndMonth = self.centerDate.description
+//            monthStr.strMonth(centerMonth)+" 2018"
+        
   
     }
     
-    private func getAllDate(completion:(() ->Void)? = nil) {
+    
+    
+    private func updateDatesArray(_ centerDate : Date,completion:(() ->Void)? = nil) {
+        
+        self.dates = []
         
         DispatchQueue.global().sync {
             
-            for i in 1...12 {
+            let calendar = Calendar.current
+            let presentDate = centerDate
+            guard let beforeDate = calendar.date(byAdding: .month, value: -1, to: presentDate) else { return }
+            guard let afterDate = calendar.date(byAdding: .month, value: +1, to: presentDate) else { return }
+            
+            self.beforeDate = beforeDate
+            self.afterDate = afterDate
+            
+            let dateArray = [beforeDate,presentDate,afterDate]
+    
+            dateArray.forEach({
                 
-                let days = Date.days(year:2018 , month: i)
+                let components = calendar.dateComponents([.year,.month,.day], from: $0)
+                guard let year = components.year else { return }
+                guard let month = components.month else { return }
+            
+                let days = Date.days(year: year, month: month)
                 self.dates.append(days)
-                print("\(i)월",days)
-            }
+                
+                DispatchQueue.main.async {
+                    
+                    self.changeMonthAndYear(month)
+                    
+                }
+        
+            })
             
             completion?()
         }
         
-    
     }
     
 }
@@ -247,7 +344,7 @@ extension CalendarViewController {
 //MARK:- Actions
 extension CalendarViewController {
     
-    func setupActionForButton() {
+    func setupActions() {
         
         let tapGeusture = UITapGestureRecognizer(target: self, action: #selector(showAndHideYearMenuTV))
         self.customNaviView.addGestureRecognizer(tapGeusture)
