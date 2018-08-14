@@ -25,7 +25,6 @@ class DateViewController : UIViewController {
         cv.isPagingEnabled = true
         cv.allowsSelection = false
         
-        
         return cv
         
     }()
