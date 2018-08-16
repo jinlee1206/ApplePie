@@ -24,6 +24,7 @@ class CalendarViewController : UIViewController {
 
     let yearMenuTableView = YearMenuTableView()
     let customNaviView = CustomNaviView()
+    
     lazy var dayStackView : UIStackView = {
         
          let sv = UIStackView(arrangedSubviews:createDayLabel("S","M","T","W","T","F","S"))
@@ -39,14 +40,6 @@ class CalendarViewController : UIViewController {
     
     // Data
     
-    // index 0 == 저번달
-    // index 1 == 이번달
-    // index 2 == 다음달
-    var beforeDate = Date()
-    var centerDate = Date()
-    var afterDate = Date()
-    var dates = [[String]]()
-    
 }
 
 
@@ -58,7 +51,7 @@ extension CalendarViewController {
         
         setupViews()
         setupActions()
-
+        self.datePageViewController.datePageVCDelegate = self
 
     }
 
@@ -147,17 +140,25 @@ extension CalendarViewController {
 
 
 
-//MARK:- Private Func
-extension CalendarViewController {
-    
-    private func changeMonthAndYear(_ centerMonth:Int) {
+//MARK:- Private Delegate
+extension CalendarViewController : DatePageViewControllerDelegate {
+    func changeMonthAndYear(month: String, year: String) {
         
-        let monthStr = Month.January
-        self.customNaviView.yearAndMonth = self.centerDate.description
-//            monthStr.strMonth(centerMonth)+" 2018"
+        self.customNaviView.yearAndMonth = month+year
         
-  
     }
+    
+    
+//    private func changeMonthAndYear(_ centerMonth:Int) {
+//
+//        let monthStr = Month.January
+//        monthStr.strMonth(centerMonth)
+//        self.customNaviView.yearAndMonth = self.centerDate.description
+////            monthStr.strMonth(centerMonth)+" 2018"
+//
+//
+//
+//    }
     
     
     

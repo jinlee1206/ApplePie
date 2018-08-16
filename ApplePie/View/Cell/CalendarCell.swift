@@ -33,7 +33,7 @@ class CalendarCell : BasicCollectionViewCell {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.isScrollEnabled = false
         cv.allowsSelection = true
-        cv.backgroundColor = .white
+//        cv.backgroundColor = .white
         return cv
         
     }()

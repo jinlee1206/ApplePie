@@ -30,7 +30,6 @@ class DateCell : BasicCollectionViewCell {
     override func initial() {
         super.initial()
         
-        self.backgroundColor = .green
         setupViews()
     }
     

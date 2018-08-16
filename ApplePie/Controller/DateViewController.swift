@@ -14,6 +14,7 @@ import RJExtension
 class DateViewController : UIViewController {
     
     var dates = [String]() {
+        
         didSet{
             
             reloadCalendarCV()
@@ -45,7 +46,6 @@ extension DateViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = .green
         setupCollectionView()
     }
     
@@ -67,7 +67,6 @@ extension DateViewController {
         }
 
         self.calenderCollectionView.registerCell(ofType: DateCell.self)
-        self.calenderCollectionView.backgroundColor = .white
         self.calenderCollectionView.delegate = self
         self.calenderCollectionView.dataSource = self
         
