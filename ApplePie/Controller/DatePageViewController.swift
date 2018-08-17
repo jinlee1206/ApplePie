@@ -191,7 +191,7 @@ extension DatePageViewController {
                 guard let year = components.year else { return }
                 guard let month = components.month else { return }
                 
-                let days = Date.days($0)
+                let days = Date().getDays($0)                
                 daysArray.append(days)
                 
                 DispatchQueue.main.async {

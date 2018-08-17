@@ -65,6 +65,16 @@ enum Month : String {
 
 public extension Date {
     
+    public func getFirstDayInMonth(_ date:Date) -> Int {
+        
+        let calender = Calendar.current
+        let components = DateComponents(calendar: calender,year: date.getYear(), month: date.getMonth(), day:1)
+        let dayInt = calender.component(.weekday, from: components.date!)
+
+        return dayInt
+
+    }
+    
     public func getWhatDay(year:Int,month:Int,day:Int) -> Int {
         
         let calender = Calendar.current
@@ -85,6 +95,32 @@ public extension Date {
 
     }
     
+    public func getDays(_ date: Date) -> [String] {
+        
+        var days = [String]()
+        
+        let calendar = Calendar.current
+        let dayInt = getFirstDayInMonth(date)
+//        let dayInt = calendar.component(.weekday, from: date)
+        let components = calendar.dateComponents([.year,.month], from: date)
+        
+        print("",dayInt)
+        
+        let range = calendar.range(of: .day, in: .month, for: date)
+        guard let numberOfDays = range?.count else { return []}
+        
+        if dayInt-2 > 0 {
+            
+            for _ in 0...dayInt-2 { days.append("") }
+            
+        }
+        
+        for i in 1...numberOfDays { days.append(i.description) }
+                
+        return days
+        
+    }
+    
     public static func getPreviousLastDays(_ previousDate:Date) -> [String] {
         
         var previousDays = [String]()
@@ -93,15 +129,34 @@ public extension Date {
         let date = previousDate // 이전달 Date
         let components = DateComponents(calendar: calendar,year: date.getYear(), month:date.getMonth(), day:date.getDay())
         var dayInt = calendar.component(.weekday, from: components.date!)
+        
         let range = calendar.range(of: .day, in: .month, for: previousDate)!
         var lastDay = range.count
+        print(dayInt,lastDay)
         
-        while !(dayInt == 1) {
+        if dayInt == 1 {
             
-            dayInt -= 1
-            lastDay -= 1
-            previousDays.insert(lastDay.description, at: 0)
+            while dayInt != 1 {
+                
+                previousDays.insert(lastDay.description, at: 0)
+                dayInt -= 1
+                lastDay -= 1
+                
+            }
+            
+        } else {
+            
+            while dayInt != 0 {
+                
+                previousDays.insert(lastDay.description, at: 0)
+                dayInt -= 1
+                lastDay -= 1
+                
+            }
+            
         }
+        
+
         
         return previousDays
     }
@@ -141,7 +196,7 @@ public extension Date {
         
             days.append(i.description)
         }
-    
+        print("days :",days)
 //        return [String]()
         return days
     }
