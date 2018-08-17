@@ -11,11 +11,6 @@ import SnapKit
 import UIKit
 import RJExtension
 
-enum Direction {
-    case LEFT
-    case RIGHT
-}
-
 
 class CalendarViewController : UIViewController {
     
@@ -109,7 +104,7 @@ extension CalendarViewController {
             $0.top.equalTo(self.dayStackView.snp.bottom)
             $0.leading.equalToSuperview()
             $0.trailing.equalToSuperview()
-            $0.height.equalTo(self.view.frame.width)
+            $0.height.equalTo(self.view.frame.width-(self.view.frame.width/7))
             
         }
         
@@ -140,29 +135,21 @@ extension CalendarViewController {
 
 
 
-//MARK:- Private Delegate
+//MARK:- DatePageViewControllerDelegate
 extension CalendarViewController : DatePageViewControllerDelegate {
-    func changeMonthAndYear(month: String, year: String) {
+    
+    func changeMonthAndYear(_ monthModel: MonthModel) {
         
-        self.customNaviView.yearAndMonth = month+year
+        let year = monthModel.year.description
+        let monthInt = monthModel.month
+        let monthStr = Date().getMonthString(monthInt)
         
+        self.customNaviView.yearAndMonth = "\(monthStr) \(year)"
     }
-    
-    
-    //    private func changeMonthAndYear(_ centerMonth:Int) {
-    //
-    //        let monthStr = Month.January
-    //        monthStr.strMonth(centerMonth)
-    //        self.customNaviView.yearAndMonth = self.centerDate.description
-    ////            monthStr.strMonth(centerMonth)+" 2018"
-    //
-    //
-    //
-    //    }
-    
-    
-    
+
 }
+
+
 
 //MARK:- Actions
 extension CalendarViewController {
@@ -171,8 +158,6 @@ extension CalendarViewController {
         
         let tapGeusture = UITapGestureRecognizer(target: self, action: #selector(showAndHideYearMenuTV))
         self.customNaviView.addGestureRecognizer(tapGeusture)
-        
-        //        self.yearMenuTableView.headerView.addTarget(self, action: #selector(test), for: .touchUpInside)
         
     }
     

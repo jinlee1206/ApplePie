@@ -12,11 +12,15 @@ import RJExtension
 
 class DateCell : BasicCollectionViewCell {
     
-    var date : String? {
-        didSet {
-            dateLabel.text = date
-        }
+    var dateModel : DateModel? {
         
+        didSet {
+            
+            guard let day = dateModel?.day else { return }
+            print(day)
+            self.dateLabel.text = day
+            
+        }
     }
     
     let dateLabel : UILabel = {

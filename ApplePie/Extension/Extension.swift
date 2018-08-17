@@ -68,17 +68,7 @@ public extension Date {
     public func getFirstDayInMonth(_ date:Date) -> Int {
         
         let calender = Calendar.current
-        let components = DateComponents(calendar: calender,year: date.getYear(), month: date.getMonth(), day:1)
-        let dayInt = calender.component(.weekday, from: components.date!)
-        
-        return dayInt
-        
-    }
-    
-    public func getWhatDay(year:Int,month:Int,day:Int) -> Int {
-        
-        let calender = Calendar.current
-        let components = DateComponents(calendar: calender,year: year, month: month, day: day)
+        let components = DateComponents(calendar: calender,year: date.getYear, month: date.getMonth, day:1)
         let dayInt = calender.component(.weekday, from: components.date!)
         
         /*
@@ -95,143 +85,49 @@ public extension Date {
         
     }
     
-    public func getDays(_ date: Date) -> [String] {
+    public func getDates(_ date:Date) -> [DateModel] {
         
-        var days = [String]()
+        var dateModel = [DateModel]()
         
         let calendar = Calendar.current
         let dayInt = getFirstDayInMonth(date)
-        //        let dayInt = calendar.component(.weekday, from: date)
-        let components = calendar.dateComponents([.year,.month], from: date)
-        
-        print("",dayInt)
-        
+        let dateComponents = calendar.dateComponents([.year,.month], from: date)
         let range = calendar.range(of: .day, in: .month, for: date)
-        guard let numberOfDays = range?.count else { return []}
+        guard let numberOfDays = range?.count else { return [] }
         
         if dayInt-2 > 0 {
             
-            for _ in 0...dayInt-2 { days.append("") }
-            
-        }
-        
-        for i in 1...numberOfDays { days.append(i.description) }
-        
-        return days
-        
-    }
-    
-    public static func getPreviousLastDays(_ previousDate:Date) -> [String] {
-        
-        var previousDays = [String]()
-        
-        let calendar = Calendar.current
-        let date = previousDate // 이전달 Date
-        let components = DateComponents(calendar: calendar,year: date.getYear(), month:date.getMonth(), day:date.getDay())
-        var dayInt = calendar.component(.weekday, from: components.date!)
-        
-        let range = calendar.range(of: .day, in: .month, for: previousDate)!
-        var lastDay = range.count
-        print(dayInt,lastDay)
-        
-        if dayInt == 1 {
-            
-            while dayInt != 1 {
+            for _ in 0...dayInt-2 {
                 
-                previousDays.insert(lastDay.description, at: 0)
-                dayInt -= 1
-                lastDay -= 1
-                
-            }
-            
-        } else {
-            
-            while dayInt != 0 {
-                
-                previousDays.insert(lastDay.description, at: 0)
-                dayInt -= 1
-                lastDay -= 1
+                let components = DateComponents(calendar: calendar,year: 1990, month: 12)
+                let dummyDates = DateModel(date: components.date!)
+                dateModel.append(dummyDates)
                 
             }
             
         }
-        
-        
-        
-        return previousDays
-    }
-    
-    public static func days(_ date:Date) -> [String] {
-        
-        var days = [String]()
-        
-        let calendar = Calendar.current
-        let previousDate = calendar.date(byAdding: .month, value: -1, to: date)
-        let previousDays = getPreviousLastDays(previousDate!)
-        previousDays.forEach({ days.append($0) })
-        
-        //        let components = calendar.dateComponents([.year,.month,.day], from: date)
-        
-        //        let targetDate = calendar.date(from: components)
-        let range = calendar.range(of: .day, in: .month, for: date)
-        guard let numberOfDays = range?.count else { return []}
-        
-        //        let dateComponents = DateComponents(year: year, month: month)
-        //        let date = calendar.date(from: dateComponents)!
-        //        let range = calendar.range(of: .day, in: .month, for: date)!
-        //        let numberOfDays = range.count
-        
-        //        var addtionalDay = getWhatDay(year: year, month: month, day: numberOfDays)
-        //
-        //        while !(addtionalDay == 1) {
-        //
-        //            addtionalDay -= 1
-        //            numDays -= 1
-        //            days.insert(numDays.description, at: 0)
-        //        }
-        
-        
         
         for i in 1...numberOfDays {
             
-            days.append(i.description)
+            let components = DateComponents(calendar: calendar,year:dateComponents.year, month: dateComponents.month, day: i)
+            let dates = DateModel(date: components.date!)
+            dateModel.append(dates)
+            
         }
-        print("days :",days)
-        //        return [String]()
-        return days
+        
+        return dateModel
     }
     
-    //    public static func days(year:Int,month:Int) -> [String] {
-    //
-    //        let calendar = Calendar.current
-    //        let date = centerDate
-    //        guard let leftDate = calendar.date(byAdding: .month, value: -1, to: date) else { return [] }
-    //
-    //        let dateComponents = DateComponents(year: year, month: month)
-    //        let calendar = Calendar.current
-    //        let date = calendar.date(from: dateComponents)!
-    //        let range = calendar.range(of: .day, in: .month, for: date)!
-    //        let numberOfDays = range.count
-    //        var days = [String]()
-    ////        var addtionalDay = getWhatDay(year: year, month: month, day: numberOfDays)
-    ////
-    ////        while !(addtionalDay == 1) {
-    ////
-    ////            addtionalDay -= 1
-    ////            numDays -= 1
-    ////            days.insert(numDays.description, at: 0)
-    ////        }
-    //
-    //        for i in 1...range.count {
-    //
-    //            days.append(i.description)
-    //        }
-    //
-    //        return days
-    //    }
     
+    public func getMonthString(_ index:Int) -> String {
+        
+        let month = Month.January
+        
+        return month.strMonth(index)
+        
+    }
     
-    public func getYear() -> Int {
+    public var getYear : Int {
         
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year], from: self)
@@ -241,7 +137,7 @@ public extension Date {
         
     }
     
-    public func getMonth() -> Int {
+    public var getMonth : Int {
         
         let calendar = Calendar.current
         let components = calendar.dateComponents([.month], from: self)
@@ -250,11 +146,10 @@ public extension Date {
         
     }
     
-    public func getDay() -> Int {
+    public var getDay : Int {
         
-        let date = Date()
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.day], from: date)
+        let components = calendar.dateComponents([.day], from: self)
         
         let day = components.day
         
@@ -262,5 +157,23 @@ public extension Date {
         
     }
     
+    public var changeDateToString : String {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateStr = dateFormatter.string(from: self)
+        
+        return dateStr
+    }
     
+    public func changeStringToDate(_ dateStr : String) -> Date {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        guard let date = dateFormatter.date(from: dateStr) else { return Date() }
+        
+        return date
+        
+    }
+
 }

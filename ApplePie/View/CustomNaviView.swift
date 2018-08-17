@@ -14,6 +14,7 @@ import UIKit
 class CustomNaviView : UIView {
     
     var yearAndMonth : String? {
+        
         didSet {
             
             yearAndMonthLabel.text = self.yearAndMonth

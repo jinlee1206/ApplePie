@@ -11,7 +11,7 @@ import RJExtension
 import UIKit
 
 protocol DatePageViewControllerDelegate : class {
-    func changeMonthAndYear(month:String,year:String)
+    func changeMonthAndYear(_ monthModel:MonthModel)
 }
 
 
@@ -25,7 +25,6 @@ class DatePageViewController : UIPageViewController {
         
         let vc = DateViewController()
         vc.view.tag = 0
-        vc.calenderCollectionView.backgroundColor = .red
         
         return vc
         
@@ -35,7 +34,6 @@ class DatePageViewController : UIPageViewController {
         
         let vc = DateViewController()
         vc.view.tag = 1
-        vc.calenderCollectionView.backgroundColor = .blue
         
         return vc
         
@@ -45,7 +43,6 @@ class DatePageViewController : UIPageViewController {
         
         let vc = DateViewController()
         vc.view.tag = 2
-        vc.calenderCollectionView.backgroundColor = .green
         
         return vc
         
@@ -61,8 +58,18 @@ class DatePageViewController : UIPageViewController {
     
     // Data
     var currentPageIndex : Int = 1  // 현재페이지 인덱스
-    var dates = [Date]() // index 0 = 한달전 1 = 현재달 2 = 한달후
-    var daysArray = [[String]]() // 달에 따른 일수
+    var monthModel = [MonthModel]() {
+        
+        didSet {
+            
+            if monthModel.count != 0 { passDaysDate() }
+            
+        }
+        
+    }
+    
+    
+    
     
     
     override func viewDidLoad() {
@@ -71,10 +78,9 @@ class DatePageViewController : UIPageViewController {
         self.dataSource = self
         setViewControllers([subViewControllers[1]], direction: .forward, animated: true, completion: nil)
         
-        updateDatesArray(date: Date()) {[weak self] (daysArray, dates) in
-            self?.daysArray = daysArray
-            self?.dates = dates
-            self?.passDaysDate()
+        updateMonthsArray(date: Date()) {[weak self] (monthModelArray) in
+            
+            self?.monthModel = monthModelArray
         }
     }
 }
@@ -122,32 +128,27 @@ extension DatePageViewController : UIPageViewControllerDelegate , UIPageViewCont
                 
             case 0: // firstDateVC
                 //왼쪽                                                            // 오른쪽
-                if self.currentPageIndex == 2 { centerDate = self.dates[0] } else if self.currentPageIndex == 1 { centerDate = self.dates[2] }
+                if self.currentPageIndex == 2 { centerDate = self.monthModel[0].monthDate } else if self.currentPageIndex == 1 { centerDate = self.monthModel[2].monthDate }
                 
             case 1: // secondDateVC
                 //왼쪽                                                            // 오른쪽
-                if self.currentPageIndex == 0 { centerDate = self.dates[0] } else if self.currentPageIndex == 2 { centerDate = self.dates[2] }
+                if self.currentPageIndex == 0 { centerDate = self.monthModel[0].monthDate } else if self.currentPageIndex == 2 { centerDate = self.monthModel[2].monthDate }
                 
             case 2: // thirdDateVC
                 //왼쪽                                                            // 오른쪽
-                if self.currentPageIndex == 1 { centerDate = self.dates[0] } else if self.currentPageIndex == 0 { centerDate = self.dates[2] }
+                if self.currentPageIndex == 1 { centerDate = self.monthModel[0].monthDate } else if self.currentPageIndex == 0 { centerDate = self.monthModel[2].monthDate }
                 
             default :
                 
                 break
             }
             
-            updateDatesArray(date:centerDate!) {[weak self] (daysArray, dates) in
-                self?.daysArray = daysArray
-                self?.dates = dates
-                self?.passDaysDate()
-                let monthStr = Month.January
-                let centerDate = dates[1]
-                let monthInt = centerDate.getMonth()
-                let month = monthStr.strMonth(monthInt)
-                let year = centerDate.getYear().description
+            
+            updateMonthsArray(date: centerDate!) {[weak self] (monthModelArray) in
                 
-                self?.datePageVCDelegate?.changeMonthAndYear(month: month, year: year)
+                self?.monthModel = monthModelArray
+                guard let currentPageMonth = self?.monthModel[1] else { return }
+                self?.datePageVCDelegate?.changeMonthAndYear(currentPageMonth)
                 
             }
             
@@ -160,76 +161,92 @@ extension DatePageViewController : UIPageViewControllerDelegate , UIPageViewCont
 
 extension DatePageViewController {
     
-    
-    /*
-     
-     센터 데이트 기준으로
-     컴플리션에 왼쪽,중앙,오른쪽 days 2차원배열로 반환
-     왼쪽,중앙,오른쪽 Date 반환
-     
-     
-     */
-    
-    private func updateDatesArray(date centerDate:Date,completion:(([[String]],[Date]) ->Void)? = nil) {
+    private func updateMonthsArray(date centerDate:Date,completion: @escaping (([MonthModel]) -> Void)) {
         
-        self.dates = []
-        self.daysArray = []
+        self.monthModel = []
         
         DispatchQueue.global().sync {
+            
+            var monthModelArray = [MonthModel]()
             
             let calendar = Calendar.current
             let date = centerDate
             guard let leftDate = calendar.date(byAdding: .month, value: -1, to: date) else { return }
             guard let rightDate = calendar.date(byAdding: .month, value: +1, to: date) else { return }
             
-            let dateArray = [leftDate,date,rightDate]
-            var daysArray = [[String]]()
+            let months = [leftDate,date,rightDate]
             
-            dateArray.forEach({
+            for date in months {
                 
-                let components = calendar.dateComponents([.year,.month,.day], from: $0)
+                let components = calendar.dateComponents([.year,.month], from: date)
+                
                 guard let year = components.year else { return }
-                guard let month = components.month else { return }
+                guard let  month = components.month else { return }
                 
-                let days = Date().getDays($0)
-                daysArray.append(days)
+                let dates = Date().getDates(date)
+                let monthModel = MonthModel(year: year, month: month, monthDate: date, dates: dates)
+                monthModelArray.append(monthModel)
                 
-                DispatchQueue.main.async {
-                    
-                }
-                
-            })
+            }
             
-            completion?(daysArray, dateArray)
+            completion(monthModelArray)
         }
         
     }
     
-    
-    //
+    // 데이터 전달
     private func passDaysDate() {
         
         switch self.currentPageIndex {
             
         case 0:
-            
-            firstDateVC.dates = self.daysArray[1]
-            secondDateVC.dates = self.daysArray[2]
-            thirdDateVC.dates = self.daysArray[0]
+            firstDateVC.dateModel = self.monthModel[1].dates
+            secondDateVC.dateModel = self.monthModel[2].dates
+            thirdDateVC.dateModel = self.monthModel[0].dates
         case 1:
-            firstDateVC.dates = self.daysArray[0]
-            secondDateVC.dates = self.daysArray[1]
-            thirdDateVC.dates = self.daysArray[2]
+            firstDateVC.dateModel = self.monthModel[0].dates
+            secondDateVC.dateModel = self.monthModel[1].dates
+            thirdDateVC.dateModel = self.monthModel[2].dates
             break
         case 2:
-            firstDateVC.dates = self.daysArray[2]
-            secondDateVC.dates = self.daysArray[0]
-            thirdDateVC.dates = self.daysArray[1]
+            firstDateVC.dateModel = self.monthModel[2].dates
+            secondDateVC.dateModel = self.monthModel[0].dates
+            thirdDateVC.dateModel = self.monthModel[1].dates
             break
         default:
             break
+            
+            
         }
         
     }
+    
+    
+//    // 데이터 전달
+//    private func passDaysDate() {
+//
+//        switch self.currentPageIndex {
+//
+//        case 0:
+//            firstDateVC.dates = self.daysArray[1]
+//            secondDateVC.dates = self.daysArray[2]
+//            thirdDateVC.dates = self.daysArray[0]
+//        case 1:
+//            firstDateVC.dates = self.daysArray[0]
+//            secondDateVC.dates = self.daysArray[1]
+//            thirdDateVC.dates = self.daysArray[2]
+//            break
+//        case 2:
+//            firstDateVC.dates = self.daysArray[2]
+//            secondDateVC.dates = self.daysArray[0]
+//            thirdDateVC.dates = self.daysArray[1]
+//            break
+//        default:
+//            break
+//
+//
+//        }
+//
+//    }
     
 }

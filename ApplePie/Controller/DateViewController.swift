@@ -13,9 +13,9 @@ import RJExtension
 
 class DateViewController : UIViewController {
     
-    var dates = [String]() {
+    var dateModel = [DateModel]() {
         
-        didSet{
+        didSet {
             
             reloadCalendarCV()
             
@@ -33,7 +33,7 @@ class DateViewController : UIViewController {
         cv.isScrollEnabled = true
         cv.isPagingEnabled = true
         cv.allowsSelection = false
-        
+        cv.backgroundColor = .white
         
         return cv
         
@@ -80,13 +80,13 @@ extension DateViewController : UICollectionViewDelegate ,UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return self.dates.count
+        return self.dateModel.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = self.calenderCollectionView.dequeueReusableCell(with: DateCell.self, for: indexPath)
-        cell.date = self.dates[indexPath.item]
+        cell.dateModel = self.dateModel[indexPath.item]
         return cell
     }
     
