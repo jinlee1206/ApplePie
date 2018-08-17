@@ -14,13 +14,13 @@ import RJExtension
 class CalendarCell : BasicCollectionViewCell {
     
     var dates = [String]() {
-
+        
         didSet {
-
+            
             self.dateCollectionView.reloadData()
-
+            
         }
-
+        
     }
     
     
@@ -33,7 +33,7 @@ class CalendarCell : BasicCollectionViewCell {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.isScrollEnabled = false
         cv.allowsSelection = true
-        cv.backgroundColor = .white
+        //        cv.backgroundColor = .white
         return cv
         
     }()
@@ -45,7 +45,7 @@ class CalendarCell : BasicCollectionViewCell {
         setupDateCollectionView()
         
     }
-
+    
 }
 
 
@@ -96,7 +96,7 @@ extension CalendarCell {
         self.dateCollectionView.delegate = self
         self.dateCollectionView.dataSource = self
         self.dateCollectionView.registerCell(ofType: DateCell.self)
-
+        
     }
     
 }
@@ -115,7 +115,7 @@ extension CalendarCell : UICollectionViewDelegate , UICollectionViewDataSource ,
         
         let cell = self.dateCollectionView.dequeueReusableCell(with: DateCell.self, for: indexPath)
         cell.date = self.dates[indexPath.item]
-    
+        
         return cell
         
     }

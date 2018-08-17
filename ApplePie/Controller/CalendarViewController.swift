@@ -20,29 +20,25 @@ enum Direction {
 class CalendarViewController : UIViewController {
     
     // UI
+    let datePageViewController = DatePageViewController()
+    
     let yearMenuTableView = YearMenuTableView()
     let customNaviView = CustomNaviView()
+    
     lazy var dayStackView : UIStackView = {
         
-         let sv = UIStackView(arrangedSubviews:createDayLabel("S","M","T","W","T","F","S"))
-         sv.axis = .horizontal
-         sv.distribution = .fillEqually
+        let sv = UIStackView(arrangedSubviews:createDayLabel("S","M","T","W","T","F","S"))
+        sv.axis = .horizontal
+        sv.distribution = .fillEqually
         
         return sv
     }()
     
-    let calendarScrollView = CalendarScrollView()
+    
+    
     
     
     // Data
-    
-    // index 0 == 저번달
-    // index 1 == 이번달
-    // index 2 == 다음달
-    var beforeDate = Date()
-    var centerDate = Date()
-    var afterDate = Date()
-    var dates = [[String]]()
     
 }
 
@@ -55,12 +51,10 @@ extension CalendarViewController {
         
         setupViews()
         setupActions()
-        updateDatesArray(Date()) {
-            
-        }
-    
-
+        self.datePageViewController.datePageVCDelegate = self
+        
     }
+    
     
 }
 
@@ -68,16 +62,21 @@ extension CalendarViewController {
 //MARK:- SetupViews
 extension CalendarViewController {
     
+    
     private func setupViews() {
+        
+        self.addChildViewController(datePageViewController)
+        view.addSubview(datePageViewController.view)
+        datePageViewController.didMove(toParentViewController: self)
         
         [
             
             dayStackView,
-            calendarScrollView,
+            datePageViewController.view,
             yearMenuTableView,
             customNaviView
-
-        ].forEach({view.addSubview($0)})
+            
+            ].forEach({view.addSubview($0)})
         
         
         yearMenuTableView.snp.makeConstraints {
@@ -105,17 +104,18 @@ extension CalendarViewController {
             $0.height.equalTo(48)
         }
         
-        calendarScrollView.snp.makeConstraints {
+        datePageViewController.view.snp.makeConstraints {
             
             $0.top.equalTo(self.dayStackView.snp.bottom)
-            $0.centerX.equalToSuperview()
-            $0.width.equalTo(self.view.frame.width)
-            $0.height.equalTo(self.view.frame.width-(self.view.frame.width/7))
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview()
+            $0.height.equalTo(self.view.frame.width)
             
         }
         
+        
+        
     }
-    
     
     private func createDayLabel(_ named:String...) -> [UILabel] {
         
@@ -133,101 +133,34 @@ extension CalendarViewController {
         }
         
     }
-
-
+    
+    
 }
 
 
 
-//MARK:- Private Func
-extension CalendarViewController {
-    
-//    private func insertAndDeleteCell(direction:Direction) {
-//
-//        let firstIndexPath = IndexPath(item: 0, section: 0)
-//        let lastIndexPath = IndexPath(item: 2, section: 0)
-//
-//        switch direction {
-//
-//        case .LEFT:
-//
-//            self.centerDate = self.beforeDate
-//            self.dates.remove(at:2)
-//            self.calenderCollectionView.deleteItems(at: [lastIndexPath])
-//            updateDatesArray(self.centerDate, completion: nil)
-//            self.calenderCollectionView.insertItems(at: [firstIndexPath])
-//            self.calenderCollectionView.scrollToItem(at:IndexPath(item: 1, section: 0), at: .centeredHorizontally, animated: false)
-//
-//
-//
-//        case .RIGHT:
-//            self.centerDate = self.afterDate
-//            self.dates.remove(at:0)
-//            self.calenderCollectionView.deleteItems(at: [firstIndexPath])
-//            updateDatesArray(self.centerDate, completion: nil)
-//            self.calenderCollectionView.insertItems(at: [lastIndexPath])
-//
-//
-//        }
-//
-//    }
-    
-//    @objc func scrollToCurrentMonth() {
-//
-//        let centerIndexPath = IndexPath(item: 1, section: 0)
-//        self.calenderCollectionView.scrollToItem(at:centerIndexPath, at: .centeredHorizontally, animated: false)
-//
-//    }
-    
-//    private func changeMonthAndYear(_ centerMonth:Int) {
-//
-//        let monthStr = Month.January
-//        self.customNaviView.yearAndMonth = self.centerDate.description
-////            monthStr.strMonth(centerMonth)+" 2018"
-//
-//
-//    }
-    
-    
-    
-    private func updateDatesArray(_ centerDate : Date,completion:(() ->Void)? = nil) {
+
+//MARK:- Private Delegate
+extension CalendarViewController : DatePageViewControllerDelegate {
+    func changeMonthAndYear(month: String, year: String) {
         
-        self.dates = []
-        
-        DispatchQueue.global().sync {
-            
-            let calendar = Calendar.current
-            let presentDate = centerDate
-            
-            guard let oneMonthAgoDate = calendar.date(byAdding: .month, value: -1, to: presentDate) else { return }
-            guard let oneMonthLaterDate = calendar.date(byAdding: .month, value: +1, to: presentDate) else { return }
-            
-            self.beforeDate = oneMonthAgoDate
-            self.afterDate = oneMonthLaterDate
-            
-            let dateArray = [oneMonthAgoDate,presentDate,oneMonthLaterDate]
-    
-            dateArray.forEach({
-                
-                let components = calendar.dateComponents([.year,.month,.day], from: $0)
-                guard let year = components.year else { return }
-                guard let month = components.month else { return }
-            
-                let days = Date.days(year: year, month: month)
-                self.dates.append(days)
-                
-                DispatchQueue.main.async {
-                    
-//                    self.changeMonthAndYear(month)
-                    
-                }
-        
-            })
-            
-            completion?()
-        }
+        self.customNaviView.yearAndMonth = month+year
         
     }
+    
+    
+    //    private func changeMonthAndYear(_ centerMonth:Int) {
+    //
+    //        let monthStr = Month.January
+    //        monthStr.strMonth(centerMonth)
+    //        self.customNaviView.yearAndMonth = self.centerDate.description
+    ////            monthStr.strMonth(centerMonth)+" 2018"
+    //
+    //
+    //
+    //    }
+    
+    
     
 }
 
@@ -238,11 +171,11 @@ extension CalendarViewController {
         
         let tapGeusture = UITapGestureRecognizer(target: self, action: #selector(showAndHideYearMenuTV))
         self.customNaviView.addGestureRecognizer(tapGeusture)
-//        self.customNaviView.leftButton.addTarget(self, action: #selector(scrollToCurrentMonth), for: .touchUpInside)
-//        self.yearMenuTableView.headerView.addTarget(self, action: #selector(test), for: .touchUpInside)
+        
+        //        self.yearMenuTableView.headerView.addTarget(self, action: #selector(test), for: .touchUpInside)
         
     }
-
+    
     @objc func showAndHideYearMenuTV() {
         
         if yearMenuTableView.isShown {
@@ -281,10 +214,10 @@ extension CalendarViewController {
                     self.yearMenuTableView.isShown = true
                 })
             }
-                
+            
         }
     }
-
+    
 }
 
 
